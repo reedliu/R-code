@@ -95,8 +95,7 @@ makeOrgPackageFromEmapper <- function(egg_f,
                                       species = "default") {
     
     # read emapper result
-    egg <- read_delim(egg_f,
-                      "\t", escape_double = FALSE, trim_ws = TRUE)
+    egg <- read.csv(egg_f, sep = "\t")
     
     # extract gene name from emapper
     gene_info <- egg %>%
