@@ -99,7 +99,7 @@ makeOrgPackageFromEmapper <- function(egg_f,
     
     # extract gene name from emapper
     gene_info <- egg %>%
-        dplyr::select(GID = query_name, GENENAME = `eggNOG annot`) %>%
+        dplyr::select(GID = query_name, GENENAME = eggNOG.annot) %>%
         na.omit()
     
     # extract go annotation from emapper
