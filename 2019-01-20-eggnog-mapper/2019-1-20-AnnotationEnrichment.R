@@ -96,30 +96,37 @@ makeOrgPackageFromEmapper <- function(egg_f,
     
     # read emapper result
     egg <- read.csv(egg_f, sep = "\t")
+egg[egg==""]<-NA #这个代码来自花花的指导(将空行变成NA，方便下面的去除)
     
     # extract gene name from emapper
     gene_info <- egg %>%
-        dplyr::select(GID = query_name, GENENAME = eggNOG.annot) %>%
-        na.omit()
+        dplyr::select(GID = query_name, GENENAME = `eggNOG annot`) %>% na.omit()
     
     # extract go annotation from emapper
-    gos <- egg %>%
-        dplyr::select(query_name, GO_terms) %>%
-        na.omit()
+    gterms <- egg %>%
+        dplyr::select(query_name, GO_terms) %>% na.omit()
     
+    # 先构建一个空的数据框(弄好大体的架构，表示其中要有GID =》query_name，GO =》GO号， EVIDENCE =》默认IDA)
+    # 关于IEA：就是一个标准，除了这个标准以外还有许多。IEA就是表示我们的注释是自动注释，无需人工检查 
+    # http://wiki.geneontology.org/index.php/Inferred_from_Electronic_Annotation_(IEA)
+    # 两种情况下需要用IEA：
+    # 1. manually constructed mappings between external classification systems and GO terms； 
+    # 2.automatic transfer of annotation to orthologous gene products.
     gene2go = data.frame(GID = character(),
                          GO = character(),
                          EVIDENCE = character())
     
-    for (row in 1:nrow(gos)) {
-        the_gid <- gos[row, "query_name"][[1]]
-        the_gos <- str_split(gos[row,"GO_terms"], ",", simplify = FALSE)[[1]]
-        
-        df_temp <- data_frame(GID = rep(the_gid, length(the_gos)),
-                              GO = the_gos,
-                              EVIDENCE = rep("IEA", length(the_gos)))
-        gene2go <- rbind(gene2go, df_temp)
+    # 然后向其中填充：注意到有的query_name对应多个GO，因此我们以GO号为标准，每一行只能有一个GO号，但query_name和Evidence可以重复
+    for (row in 1:nrow(gterms)) {
+      gene_terms <- str_split(gterms[row,"GO_terms"], ",", simplify = FALSE)[[1]]  
+      gene_id <- gterms[row, "query_name"][[1]]
+      tmp <- data_frame(GID = rep(gene_id, length(gene_terms)),
+                              GO = gene_terms,
+                              EVIDENCE = rep("IEA", length(gene_terms)))
+        gene2go <- rbind(gene2go, tmp)
     }
+
+
     
     # extract kegg pathway annotation from emapper
     gene2ko <- egg %>%
