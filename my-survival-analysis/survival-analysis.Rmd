@@ -1,0 +1,32 @@
+---
+title: "survival-analysis"
+author: "Reed Liu jieandze1314@gmail.com"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = F)
+knitr::opts_chunk$set(message  = F) 
+```
+# 生存分析图
+```{r}
+library(ggplot2)
+library(survival)
+library(survminer)
+svData <- read.csv('~/Downloads/e5-BRCA_7157_50_50.csv')
+# 这个原始数据来自于http://www.oncolnc.org/ 
+svData$Status <- ifelse(svData$Status == "Dead", 1, 0)
+fit <- survfit(Surv(Days,Status)~Group, data=svData)
+
+ggsurvplot(fit, pval = TRUE, linetype = "solid",  
+           palette =c("blue","red"),
+           legend.title="",legend=c(0.7,0.9),legend.labs=c("High-expression","low-expression"),
+           conf.int = T,#显示置信区间
+           conf.int.style="ribbon",#展示方式
+           conf.int.alpha=0.1)#透明度
+#可以保存为pdf
+# ggsave(file="survivalcurve.pdf")
+```
+
