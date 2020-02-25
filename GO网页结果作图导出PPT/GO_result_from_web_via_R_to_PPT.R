@@ -51,8 +51,9 @@ for(i in 1:length(tmp)){
     # 重新排序
     dat <- dat[,c(9,1:7,10,8)]
     dat <- dat[,-6]
-    
-    
+    # 把dat的Description首字母大写
+    dat$Description <- paste(toupper(substring(dat$Description, 1,1)), 
+                             substring(dat$Description, 2), sep="")
     ####################################
     # 然后把数据框处理成作图的格式
     ####################################
