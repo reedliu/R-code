@@ -47,7 +47,7 @@ if(F){
     library(jsonlite)
     library(purrr)
     library(RCurl)
-    
+    library(tidyverse)
     update_kegg <- function(json = "ko00001.json") {
         pathway2name <- tibble(Pathway = character(), Name = character())
         ko2pathway <- tibble(Ko = character(), Pathway = character())
@@ -100,7 +100,7 @@ egg[egg==""]<-NA #这个代码来自花花的指导(将空行变成NA，方便�
     
     # extract gene name from emapper
     gene_info <- egg %>%
-        dplyr::select(GID = query_name, GENENAME = `eggNOG annot`) %>% na.omit()
+        dplyr::select(GID = query_name, GENENAME = `eggNOG.annot`) %>% na.omit()
     
     # extract go annotation from emapper
     gterms <- egg %>%
